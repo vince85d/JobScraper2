@@ -1,0 +1,33 @@
+name: Daily TAMU Job Scraper
+
+on:
+  schedule:
+    - cron: '0 15 * * *'  # Runs every day at 15:00 UTC
+  workflow_dispatch:      # Allows manual trigger
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+
+    - name: Run scraper
+      env:
+        FROM_EMAIL: ${{ secrets.FROM_EMAIL }}
+        EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        TO_EMAIL: ${{ secrets.TO_EMAIL }}
+        SMTP_SERVER: smtp.gmail.com
+        SMTP_PORT: 587
+      run: |
+        python tamu_job_scraper.py
